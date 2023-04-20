@@ -1,0 +1,38 @@
+.box1 {
+  background: rgb(201, 90, 237);
+  background: linear-gradient(
+    138deg,
+    rgba(201, 90, 237, 1) 0%,
+    rgba(136, 25, 166, 1) 35%,
+    rgba(255, 0, 91, 1) 100%
+  );
+}
+
+.box2 {
+  background: rgb(75, 86, 168);
+  background: linear-gradient(
+    138deg,
+    rgba(75, 86, 168, 1) 1%,
+    rgba(0, 99, 255, 1) 90%
+  );
+}
+
+.box3 {
+  background: rgb(62, 67, 218);
+  background: linear-gradient(
+      138deg,
+      rgba(62, 67, 218, 1) 23%,
+      rgba(80, 49, 185, 1) 31%,
+      rgba(170, 9, 126, 1) 60%
+    );
+}
+
+.box4 {
+    background: rgb(218,62,107);
+    background: linear-gradient(138deg, rgba(218,62,107,1) 9%, rgba(185,174,49,1) 45%, rgba(170,9,126,1) 99%);
+}
+
+
+.col {
+    border-radius: 25px;
+}

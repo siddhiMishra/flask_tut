@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Fetch Image Example</title>
+</head>
+<body>
+	<h1>Fetch Image Example</h1>
+	<img id="myImage" />
+	<script >
+        // Get the image element
+const image = document.getElementById("myImage");
+
+// Set the URL of the image you want to fetch
+const imageURL = "https://example.com/myimage.jpg";
+
+// Use fetch to get the content of the image
+fetch(imageURL)
+  .then(response => response.blob())
+  .then(blob => {
+    // Use createObjectURL to create a URL for the image content
+    const objectURL = URL.createObjectURL(blob);
+    // Set the src of the image element to the object URL
+    image.src = objectURL;
+  });
+
+    </script>
+</body>
+</html>

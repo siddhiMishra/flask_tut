@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en" class="h-100">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hugging Face</title>
+  <script src="https://cdn.ckeditor.com/4.20.2/standard/ckeditor.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
+
+
+
+</head>
+
+<body class="h-100">
+
+
+  <nav class="navbar navbar-expand-lg bg-body-tertiary">
+       
+        
+          <!-- <a class="navbar-brand" href="index.html">Hugging Face</a> -->
+          <img src="static/img/cdac-logo.png" height="50px">
+
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+            data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
+            aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarSupportedContent">
+
+
+            <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+
+              <div class="">
+                <form class="d-flex" role="search">
+                  <!-- <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search"> -->
+                </form>
+              </div>
+              <!-- </li> -->
+              <li class="nav-item">
+                <a class="nav-link bi bi-house-door " href="/"> &nbsp;&nbsp;Home</a>
+              </li>
+              <span class="nav-seprator"></span>
+              <li class="nav-item">
+                <a class="nav-link " href="/spaces"> &nbsp;&nbsp;R&D</a>
+              </li>
+              <!-- <li class="nav-item">
+            <a class="nav-link "> &nbsp;&nbsp;ALLIANCE</a>
+          </li> -->
+              <!-- <li class="nav-item">
+            <a class="nav-link "> &nbsp;&nbsp;TENDER/EOI</a>
+          </li> -->
+              <!-- <li class="nav-item">
+            <a class="nav-link "> &nbsp;&nbsp;CAREERS</a>
+          </li> -->
+
+              </li>
+              <!-- <li><a class="dropdown-item" href="#">Something else here</a></li> -->
+            </ul>
+            </li>
+            </ul>
+     
+    </div>
+  </nav>
+  <section class="container my-5">
+    <div class="row">
+      <div class="col-6 mx-auto">
+        <h3 class=" my-4 mx-4 text-center">Optical character recognition</h3>
+        <div class="card border-0 shadow-lg">
+          <div class="card-body">
+            <form>
+
+              <div class="form-group mb-3">
+                <input type="file" id="ocr" class="form-control">
+              </div>
+              <button type="button" class=" btn btn-primary" onclick="content()">Convert</button>
+              <div class="spinner-border spinner-border-sm ms-2 d-none" id="loader" role="status">
+                <span class="sr-only"></span>
+              </div>
+            </form>
+          </div>
+        </div>
+       
+      </div>
+    </div>
+    <div class="row my-4 ">
+      <div class="col-4">
+        <div><img id="previewimg" class="img-fluid" src=""></div>
+        
+      </div>
+      <div class="col-8">
+      <textarea  id="result" name="result"></textarea>
+      </div>
+    </div>
+    </div>
+  </section>
+
+
+
+  <script>
+    CKEDITOR.replace('result');
+  </script>
+
+  <!-- 
+
+  <input type="file" id="ocr">
+  <img src="/image1.jpg" alt="Image Preview">
+  <button class=" btn btn-primary" onclick="content()">button</button>
+  <div class="my-4 mx-2" id="result"></div> -->
+
+
+  <script>
+
+
+
+    //  async   function content() {
+
+
+    //     const image = document.getElementById("ocr")
+    //  const file = image.files[0]
+    //   console.log(file)
+    // const url = await toBase64(file)
+    // console.log(url)
+
+    //     }
+
+
+    const toBase64 = file => new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve((reader.result).split(",")[1]);
+      reader.onerror = error => reject(error);
+    });
+
+
+    async function content() {
+
+      const image = document.getElementById("ocr").files[0]
+      const previewimg = document.getElementById("previewimg")
+      const base64 = await toBase64(image)
+      previewimg.setAttribute('src', URL.createObjectURL(image))
+      const loader = document.getElementById("loader")
+      loader.classList.remove('d-none')
+      ev.setAttribute('disabled', 'true')
+      fetch("http://10.226.30.33:8081/post_json", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+
+        },
+        body: JSON.stringify({
+          "image-content": base64
+        })
+
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          console.log(data)
+          //  we used value for input 
+          // we used innerhtml or innertext for all other tag meams which are not input , textarea , select
+          CKEDITOR.instances['result'].setData(data['ocr-output'])
+          // document.getElementById("result").value = data['ocr-output']
+          loader.classList.add('d-none')
+          ev.removeAttribute('disabled')
+        })
+        .catch((error) => {
+          console.error(error);
+          loader.classList.add('d-none')
+          ev.removeAttribute('disabled')
+        });
+
+    }
+  </script>
+</body>
+
+</html>

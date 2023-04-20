@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <script src="https://cdn.ckeditor.com/4.20.2/standard/ckeditor.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+
+</head>
+
+<body class="h-100">
+
+
+  <nav class="navbar navbar-expand-lg bg-body-tertiary">
+       
+        
+          <!-- <a class="navbar-brand" href="index.html">Hugging Face</a> -->
+          <img src="static/img/cdac-logo.png" height="50px">
+
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+            data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
+            aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarSupportedContent">
+
+
+            <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+
+              <div class="">
+                <form class="d-flex" role="search">
+                  <!-- <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search"> -->
+                </form>
+              </div>
+              <!-- </li> -->
+              <li class="nav-item">
+                <a class="nav-link bi bi-house-door " href="/"> &nbsp;&nbsp;Home</a>
+              </li>
+              <span class="nav-seprator"></span>
+              <li class="nav-item">
+                <a class="nav-link " href="/spaces"> &nbsp;&nbsp;R&D</a>
+              </li>
+              <!-- <li class="nav-item">
+            <a class="nav-link "> &nbsp;&nbsp;ALLIANCE</a>
+          </li> -->
+              <!-- <li class="nav-item">
+            <a class="nav-link "> &nbsp;&nbsp;TENDER/EOI</a>
+          </li> -->
+              <!-- <li class="nav-item">
+            <a class="nav-link "> &nbsp;&nbsp;CAREERS</a>
+          </li> -->
+
+              </li>
+              <!-- <li><a class="dropdown-item" href="#">Something else here</a></li> -->
+            </ul>
+            </li>
+            </ul>
+     
+    </div>
+  </nav>
+
+ 
+  <form>
+    <section class="container my-5">
+      <div class="row">
+        <div class="col-6 mx-auto">
+          <h3  class=" my-4 mx-4 text-center">Automatic Speech Recognition</h3>
+          <div class="card border-0 shadow-lg">
+            <div class="card-body">
+              <form>
+                <div class="form-group mb-3">
+                  <select id="lang" class="form-select">
+                    <option value="HI" selected>Hindi</option>
+                    <option value="BN">Bengali</option>
+                    <option value="EN">English</option>
+                  </select>
+                </div>
+                <div class="form-group mb-3">
+                  <input type="file" id="audiofileinput" class="form-control">
+                </div>
+                <button onclick="convertAudioToText(this)" type="button" class="btn btn-primary">Convert
+                  <div class="spinner-border spinner-border-sm ms-2 d-none" id="loader" role="status">
+                    <span class="sr-only"></span>
+                  </div>
+                </button>
+
+              </form>
+            </div>
+            <div class="card-body">
+          
+              <div >
+                <textarea id="result" name="result"></textarea>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </form>
+
+  <script>
+    CKEDITOR.replace('result');
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN"
+    crossorigin="anonymous"></script>
+  <script>
+
+    // function increaseFontSize() {
+    //   const result = document.getElementById('result');
+    //   const fs = parseInt(result.style.fontSize);
+    //   result.style.fontSize = `${fs + 1}px`;
+    // }
+    // function decreaseFontSize() {
+    //   const result = document.getElementById('result');
+    //   const fs = parseInt(result.style.fontSize);
+    //   result.style.fontSize = `${fs - 1}px`;
+    // }
+
+    async function audioToBase64(audioFile) {
+      return new Promise((resolve, reject) => {
+        let reader = new FileReader();
+
+        // onerror is catch  (fault data)
+        reader.onerror = reject;
+        reader.onload = (e) => resolve(e.target.result);
+        reader.readAsDataURL(audioFile);
+      });
+    }
+
+    async function convertAudioToText(ev) {
+      const lang = document.getElementById('lang').value;
+      const file = document.getElementById('audiofileinput').files[0];
+      const loader = document.getElementById("loader")
+      loader.classList.remove('d-none')
+      ev.setAttribute('disabled', 'true')
+      let base64String = await audioToBase64(file);
+
+      fetch('http://10.10.10.214:8082/CallASR', {
+        method: 'POST',
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          language: lang,
+          message: base64String
+        })
+      }).then(response => response.json())
+        .then(data => {
+          console.log(data);
+          const resultdiv = document.getElementById('result')
+          // resultdiv.value = data.result
+          CKEDITOR.instances['result'].setData(data.result)
+          loader.classList.add('d-none')
+          ev.removeAttribute('disabled')
+        })
+        .catch(error => {
+          console.error(error);
+          loader.classList.add('d-none')
+          ev.removeAttribute('disabled')
+
+        });
+
+    }
+
+
+  </script>
+</body>
+
+</html>
